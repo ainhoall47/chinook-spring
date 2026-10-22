@@ -8,6 +8,7 @@ import org.ainhoall.modelo.Pista;
 import org.ainhoall.repositorio.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import java.util.Optional;
 
 import java.util.Scanner;
 
@@ -25,6 +26,7 @@ public class MenuConsola implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        pruebaCrud();
         int opcion;
         do {
             mostrarMenu();
@@ -76,6 +78,48 @@ public class MenuConsola implements CommandLineRunner {
         return teclado.nextLine().trim();
     }
 
+    private int leerEntero(String mensaje) {
+        while (true) {
+            try {
+                return Integer.parseInt(leerTexto(mensaje));
+            } catch (NumberFormatException e) {
+                System.out.println("Escribe un número entero.");
+            }
+        }
+    }
+
+private void pruebaCrud(){
+    System.out.println("--- Paso 4: CRUD ---");
+
+    Genero nuevo = generoRepository.save(new Genero(null, "Género de prueba"));
+    System.out.println("Insertado: " + nuevo);
+
+    nuevo.setNombre("Género cambiado");
+    generoRepository.save(nuevo);
+
+    Optional<Genero> leido = generoRepository.findById(nuevo.getId());
+    if (leido.isPresent()) {
+        System.out.println("Leído: " + leido.get());
+    }
+
+    Genero inexistente = generoRepository.findById(9999).orElse(null);
+    if (inexistente == null) {
+        System.out.println("Género 9999: no existe");
+    }
+
+    Optional<Genero> otro = generoRepository.findById(9999);
+    try {
+        if (otro.isEmpty()) {
+            throw new IllegalArgumentException("No existe el género 9999");
+        }
+    } catch (IllegalArgumentException e) {
+        System.out.println("Error controlado: " + e.getMessage());
+    }
+
+    generoRepository.deleteById(nuevo.getId());
+    System.out.println("Géneros en total: " + generoRepository.count());
+}
+/*
     private void pruebaEntidades() {
         System.out.println("--- Paso 3: comprobar las entidades ---");
 
@@ -87,7 +131,8 @@ public class MenuConsola implements CommandLineRunner {
 
         System.out.println("Playlists: " + playlistRepository.count());
     }
-
+*/
+/*
     private void pruebaRecursion() {
         Artista artista = new Artista();
         artista.setNombre("Banda de prueba");
@@ -100,20 +145,12 @@ public class MenuConsola implements CommandLineRunner {
 
         System.out.println(artista);
     }
-
+*/
+/*
     private void pruebaLazy() {
         Artista artista = artistaRepository.findById(1).get();
         System.out.println("Artista: " + artista.getNombre());
         System.out.println("Álbumes: " + artista.getAlbumes().size());
     }
-
-    private int leerEntero(String mensaje) {
-        while (true) {
-            try {
-                return Integer.parseInt(leerTexto(mensaje));
-            } catch (NumberFormatException e) {
-                System.out.println("Escribe un número entero.");
-            }
-        }
-    }
+*/
 }
