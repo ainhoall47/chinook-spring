@@ -5,6 +5,8 @@ import org.ainhoall.modelo.Album;
 import org.ainhoall.modelo.Artista;
 import org.ainhoall.modelo.Genero;
 import org.ainhoall.modelo.Pista;
+import org.ainhoall.operaciones.ConsultaArtistas;
+import org.ainhoall.operaciones.GestorPlaylists;
 import org.ainhoall.repositorio.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,8 @@ public class MenuConsola implements CommandLineRunner {
     private final AlbumRepository albumRepository;
     private final PistaRepository pistaRepository;
     private final PlaylistRepository playlistRepository;
+    private final GestorPlaylists gestorPlaylists;
+    private final ConsultaArtistas consultaArtistas;
 
     @Override
     public void run(String... args) {
@@ -45,6 +49,8 @@ public class MenuConsola implements CommandLineRunner {
                     case 9 -> cambiarTituloAlbum();
                     case 10 -> borrarAlbum();
                     case 11 -> contarPistasPorPlaylist();
+                    case 12 -> anadirPistaAPlaylist();
+                    case 13 -> titulosDeAlbumes();
                     case 0 -> System.out.println("Hasta pronto.");
                     default -> System.out.println("Esa opción no existe.");
                 }
@@ -121,7 +127,6 @@ public class MenuConsola implements CommandLineRunner {
         if (!albumRepository.existsById(albumId)) {
             throw new IllegalArgumentException("No existe el álbum " + albumId);
         }
-        // Si tiene pistas, la clave foránea impediría borrarlo: lo comprobamos antes
         if (pistaRepository.countByAlbumId(albumId) > 0) {
             throw new IllegalArgumentException("El álbum tiene pistas y no se puede borrar.");
         }
@@ -130,7 +135,6 @@ public class MenuConsola implements CommandLineRunner {
     }
 
     private void contarPistasPorGenero() {
-        // Cada fila es un Object[] {nombre, número de pistas}
         for (Object[] fila : generoRepository.contarPistas()) {
             String nombre = (String) fila[0];
             Long pistas = (Long) fila[1];
@@ -151,7 +155,6 @@ public class MenuConsola implements CommandLineRunner {
 
     private void artistasMasVendidos() {
         int n = leerEntero("¿Cuántos artistas quieres ver? ");
-        // La consulta es nativa: SUM puede llegar como BigDecimal o Long, por eso se lee como Number
         for (Object[] fila : artistaRepository.masVendidos(n)) {
             System.out.println(fila[0] + ": " + ((Number) fila[1]).longValue() + " unidades");
         }
@@ -189,7 +192,7 @@ public class MenuConsola implements CommandLineRunner {
     }
 
     private void contarPistasPorPlaylist() {
-        // Cada fila: {id, nombre, número de pistas}
+
         for (Object[] fila : playlistRepository.contarPistas()) {
             System.out.println(fila[0] + " - " + fila[1] + ": " + fila[2] + " pistas");
         }
@@ -215,6 +218,41 @@ public class MenuConsola implements CommandLineRunner {
             }
         }
     }
+
+    private void anadirPistaAPlaylist() {
+        int playlistId = leerEntero("Id de la playlist: ");
+        int pistaId = leerEntero("Id de la pista: ");
+        // TODO 1: llama a gestorPlaylists.anadirPista(playlistId, pistaId). Devuelve true si la pista se ha añadido
+        boolean añadioPista = gestorPlaylists.anadirPista(playlistId, pistaId);
+        // TODO 2: si devuelve true, escribe "Pista añadida a la playlist."
+        //         si no, escribe "La pista ya estaba en la playlist."
+        if(!añadioPista){
+            System.out.println("La pista ya estaba en la playlist.");
+        } else {
+            System.out.println("Pista añadida a la playlist.");
+        }
+    }
+
+    private void titulosDeAlbumes() {
+        int artistaId = leerEntero("Id del artista: ");
+        // TODO: llama a consultasArtistas.titulosDeAlbumes(artistaId), que devuelve una List<String>,
+        //       e imprime cada título con un for
+        List<String> listaTitulos = consultaArtistas.titulosDeAlbumes(artistaId);
+        for(String titulo : listaTitulos){
+            System.out.println(titulo);
+        }
+    }
+/*
+    // PONER "ALTER TABLE Playlist MODIFY PlaylistId INT NOT NULL AUTO_INCREMENT;"
+    private void pruebaAtomicidad() {
+        try {
+            gestorPlaylists.crearConPistas("Lista de prueba", List.of(1, 2, 999999));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        contarPistasPorPlaylist();
+    }
+*/
 /*
 private void pruebaCrud(){
     System.out.println("--- Paso 4: CRUD ---");
