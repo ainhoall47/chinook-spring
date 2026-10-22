@@ -26,5 +26,6 @@ public class Artista {
     private String nombre;
 
     @OneToMany(mappedBy = "artista")
+    @ToString.Exclude
     private Set<Album> albumes = new HashSet<>();
 }

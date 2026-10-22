@@ -2,6 +2,7 @@ package org.ainhoall.app;
 
 import lombok.RequiredArgsConstructor;
 import org.ainhoall.modelo.Album;
+import org.ainhoall.modelo.Artista;
 import org.ainhoall.modelo.Genero;
 import org.ainhoall.modelo.Pista;
 import org.ainhoall.repositorio.*;
@@ -24,7 +25,6 @@ public class MenuConsola implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        pruebaEntidades();
         int opcion;
         do {
             mostrarMenu();
@@ -86,6 +86,25 @@ public class MenuConsola implements CommandLineRunner {
         System.out.println("Pista: " + pista.getNombre() + " | " + pista.getDuracion() + " | " + pista.getGenero().getNombre());
 
         System.out.println("Playlists: " + playlistRepository.count());
+    }
+
+    private void pruebaRecursion() {
+        Artista artista = new Artista();
+        artista.setNombre("Banda de prueba");
+
+        Album album = new Album();
+        album.setTitulo("Disco de prueba");
+        album.setArtista(artista);
+
+        artista.getAlbumes().add(album);
+
+        System.out.println(artista);
+    }
+
+    private void pruebaLazy() {
+        Artista artista = artistaRepository.findById(1).get();
+        System.out.println("Artista: " + artista.getNombre());
+        System.out.println("Álbumes: " + artista.getAlbumes().size());
     }
 
     private int leerEntero(String mensaje) {
