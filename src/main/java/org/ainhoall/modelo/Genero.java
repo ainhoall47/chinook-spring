@@ -1,10 +1,22 @@
 package org.ainhoall.modelo;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+// Lombok escribe por nosotros, al compilar, los getters, los setters, los constructores y toString().
 @Entity
 @Table(name = "Genre")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Genero {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "GenreId")
@@ -12,34 +24,4 @@ public class Genero {
 
     @Column(name = "Name")
     private String nombre;
-
-    // JPA necesita un constructor vacío para crear los objetos al leer las filas
-    public Genero() {
-    }
-
-    public Genero(Integer id, String nombre) {
-        this.id = id;
-        this.nombre = nombre;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    @Override
-    public String toString() {
-        return id + " - " + nombre;
-    }
 }

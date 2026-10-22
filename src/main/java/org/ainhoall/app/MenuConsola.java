@@ -1,5 +1,6 @@
 package org.ainhoall.app;
 
+import lombok.RequiredArgsConstructor;
 import org.ainhoall.modelo.Genero;
 import org.ainhoall.repositorio.GeneroRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -8,14 +9,11 @@ import org.springframework.stereotype.Component;
 import java.util.Scanner;
 
 @Component
+@RequiredArgsConstructor
 public class MenuConsola implements CommandLineRunner {
 
     private final Scanner teclado = new Scanner(System.in);
     private final GeneroRepository generoRepository;
-
-    public MenuConsola(GeneroRepository generoRepository) {
-        this.generoRepository = generoRepository;
-    }
 
     @Override
     public void run(String... args) {
