@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import java.util.Scanner;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -33,9 +35,16 @@ public class MenuConsola implements CommandLineRunner {
             try {
                 switch (opcion) {
                     case 1 -> listarGeneros();
+                    case 2 -> contarPistasPorGenero();
+                    case 3 -> buscarArtistas();
+                    case 4 -> artistasMasVendidos();
+                    case 5 -> albumesDeArtista();
+                    case 6 -> pistasDeGenero();
+                    case 7 -> pistasDeAlbum();
                     case 8 -> insertarAlbum();
                     case 9 -> cambiarTituloAlbum();
                     case 10 -> borrarAlbum();
+                    case 11 -> contarPistasPorPlaylist();
                     case 0 -> System.out.println("Hasta pronto.");
                     default -> System.out.println("Esa opción no existe.");
                 }
@@ -68,7 +77,7 @@ public class MenuConsola implements CommandLineRunner {
     // ---------- Opciones ----------
 
     private void listarGeneros() {
-        for (Genero genero : generoRepository.findAll()) {
+        for (Genero genero : generoRepository.findAllByOrderByNombre()) {
             System.out.println(genero);
         }
     }
@@ -109,15 +118,85 @@ public class MenuConsola implements CommandLineRunner {
 
     private void borrarAlbum() {
         int albumId = leerEntero("Id del álbum que quieres borrar: ");
-        // TODO 1: si NO existe un álbum con ese id (albumRepository.existsById(...)),
-        //         lanza IllegalArgumentException("No existe el álbum " + albumId)
-        boolean albumExistencia = albumRepository.existsById(albumId);
-        if(!albumExistencia){
-            throw new IllegalArgumentException("No existe el album " + albumId);
+        if (!albumRepository.existsById(albumId)) {
+            throw new IllegalArgumentException("No existe el álbum " + albumId);
         }
-        // TODO 2: bórralo con albumRepository.deleteById(...)
+        // Si tiene pistas, la clave foránea impediría borrarlo: lo comprobamos antes
+        if (pistaRepository.countByAlbumId(albumId) > 0) {
+            throw new IllegalArgumentException("El álbum tiene pistas y no se puede borrar.");
+        }
         albumRepository.deleteById(albumId);
         System.out.println("Álbum borrado.");
+    }
+
+    private void contarPistasPorGenero() {
+        // Cada fila es un Object[] {nombre, número de pistas}
+        for (Object[] fila : generoRepository.contarPistas()) {
+            String nombre = (String) fila[0];
+            Long pistas = (Long) fila[1];
+            System.out.println(nombre + ": " + pistas);
+        }
+    }
+
+    private void buscarArtistas() {
+        String texto = leerTexto("Texto a buscar: ");
+        List<Artista> artistas = artistaRepository.findByNombreContainingIgnoreCaseOrderByNombre(texto);
+        if (artistas.isEmpty()) {
+            System.out.println("Ningún artista contiene \"" + texto + "\".");
+        }
+        for (Artista artista : artistas) {
+            System.out.println(artista);
+        }
+    }
+
+    private void artistasMasVendidos() {
+        int n = leerEntero("¿Cuántos artistas quieres ver? ");
+        // La consulta es nativa: SUM puede llegar como BigDecimal o Long, por eso se lee como Number
+        for (Object[] fila : artistaRepository.masVendidos(n)) {
+            System.out.println(fila[0] + ": " + ((Number) fila[1]).longValue() + " unidades");
+        }
+    }
+
+    private void albumesDeArtista() {
+        int artistaId = leerEntero("Id del artista: ");
+        List<Album> albumes = albumRepository.findByArtistaIdOrderByTitulo(artistaId);
+        if (albumes.isEmpty()) {
+            System.out.println("Ese artista no tiene álbumes.");
+        }
+        for (Album album : albumes) {
+            System.out.println(album.getId() + " - " + album.getTitulo());
+        }
+    }
+
+    private void pistasDeGenero() {
+        int generoId = leerEntero("Id del género: ");
+        System.out.println(pistaRepository.countByGeneroId(generoId) + " pistas. Importe total: "
+                + pistaRepository.sumarPrecios(generoId).orElse(BigDecimal.ZERO) + " €. Las 20 primeras:");
+        for (Pista pista : pistaRepository.findTop20ByGeneroIdOrderByNombre(generoId)) {
+            mostrarPista(pista);
+        }
+    }
+
+    private void pistasDeAlbum() {
+        int albumId = leerEntero("Id del álbum: ");
+        List<Pista> pistas = pistaRepository.findByAlbumIdOrderById(albumId);
+        if (pistas.isEmpty()) {
+            System.out.println("Ese álbum no tiene pistas.");
+        }
+        for (Pista pista : pistas) {
+            mostrarPista(pista);
+        }
+    }
+
+    private void contarPistasPorPlaylist() {
+        // Cada fila: {id, nombre, número de pistas}
+        for (Object[] fila : playlistRepository.contarPistas()) {
+            System.out.println(fila[0] + " - " + fila[1] + ": " + fila[2] + " pistas");
+        }
+    }
+
+    private void mostrarPista(Pista pista) {
+        System.out.println(pista.getNombre() + " | " + pista.getDuracion() + " | " + pista.getPrecioUnitario() + " €");
     }
 
     // ---------- Utilidades ----------
