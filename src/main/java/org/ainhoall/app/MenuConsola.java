@@ -1,8 +1,10 @@
 package org.ainhoall.app;
 
 import lombok.RequiredArgsConstructor;
+import org.ainhoall.modelo.Album;
 import org.ainhoall.modelo.Genero;
-import org.ainhoall.repositorio.GeneroRepository;
+import org.ainhoall.modelo.Pista;
+import org.ainhoall.repositorio.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +17,14 @@ public class MenuConsola implements CommandLineRunner {
     private final Scanner teclado = new Scanner(System.in);
     private final GeneroRepository generoRepository;
 
+    private final ArtistaRepository artistaRepository;
+    private final AlbumRepository albumRepository;
+    private final PistaRepository pistaRepository;
+    private final PlaylistRepository playlistRepository;
+
     @Override
     public void run(String... args) {
+        pruebaEntidades();
         int opcion;
         do {
             mostrarMenu();
@@ -66,6 +74,18 @@ public class MenuConsola implements CommandLineRunner {
     private String leerTexto(String mensaje) {
         System.out.print(mensaje);
         return teclado.nextLine().trim();
+    }
+
+    private void pruebaEntidades() {
+        System.out.println("--- Paso 3: comprobar las entidades ---");
+
+        Album album = albumRepository.findById(1).get();
+        System.out.println("Álbum: " + album.getTitulo() + " de " + album.getArtista().getNombre());
+
+        Pista pista = pistaRepository.findById(1).get();
+        System.out.println("Pista: " + pista.getNombre() + " | " + pista.getDuracion() + " | " + pista.getGenero().getNombre());
+
+        System.out.println("Playlists: " + playlistRepository.count());
     }
 
     private int leerEntero(String mensaje) {
