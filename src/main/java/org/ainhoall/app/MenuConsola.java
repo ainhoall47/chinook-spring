@@ -16,7 +16,6 @@ import java.util.Scanner;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Component
 @RequiredArgsConstructor
 public class MenuConsola implements CommandLineRunner {
 
