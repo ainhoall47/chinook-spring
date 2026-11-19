@@ -1,10 +1,9 @@
 package org.ainhoall.servicio;
 
-import org.ainhoall.modelo.Artista;
-import org.ainhoall.modelo.Genero;
+import org.ainhoall.dto.GeneroResumen;
 
 import java.util.List;
 
 public interface GeneroService {
-    List<Genero> listar();
+    List<GeneroResumen> listar();
 }

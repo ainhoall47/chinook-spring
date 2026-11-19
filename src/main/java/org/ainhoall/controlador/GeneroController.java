@@ -1,5 +1,6 @@
 package org.ainhoall.controlador;
 
+import org.ainhoall.dto.GeneroResumen;
 import org.ainhoall.modelo.Album;
 import org.ainhoall.modelo.Genero;
 import org.ainhoall.servicio.ArtistaService;
@@ -24,11 +25,11 @@ public class GeneroController {
     public String listar() {
         StringBuilder html = new StringBuilder();
         html.append("<h1>Géneros</h1><ul>");
-        for (Genero genero : generoService.listar()) {
-            html.append("<li>").append(Html.esc(genero.getNombre())).append("</li>");
+        for (GeneroResumen genero : generoService.listar()) {
+            html.append("<li>").append(Html.esc(genero.nombre()))
+                    .append(" (").append(genero.numeroPistas()).append(" pistas)</li>");
         }
         html.append("</ul>");
         return html.toString();
     }
-
 }

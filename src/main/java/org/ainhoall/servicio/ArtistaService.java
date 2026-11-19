@@ -1,11 +1,13 @@
 package org.ainhoall.servicio;
 
+import org.ainhoall.dto.ArtistaDetalle;
+import org.ainhoall.dto.ArtistaResumen;
 import org.ainhoall.modelo.Artista;
 
 import java.util.List;
 
 public interface ArtistaService {
-    List<Artista> buscarPorNombre(String texto);
+    List<ArtistaResumen> buscarPorNombre(String texto);
 
-    Artista buscarPorId(Integer id);
+    ArtistaDetalle buscarPorId(Integer id);
 }

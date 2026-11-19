@@ -1,7 +1,8 @@
 package org.ainhoall.controlador;
 
-import org.ainhoall.modelo.Album;
-import org.ainhoall.modelo.Artista;
+import org.ainhoall.dto.AlbumResumen;
+import org.ainhoall.dto.ArtistaDetalle;
+import org.ainhoall.dto.ArtistaResumen;
 import org.ainhoall.servicio.ArtistaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -37,30 +39,35 @@ public class ArtistaController {
                 .append("<input name=\"texto\" value=\"").append(Html.esc(texto)).append("\">")
                 .append(" <button>Buscar</button></form>");
         if (!texto.isBlank()) {
-            List<Artista> artistas = artistaService.buscarPorNombre(texto);
+            List<ArtistaResumen> artistas = artistaService.buscarPorNombre(texto);
             html.append("<p>Artistas que contienen «").append(Html.esc(texto)).append("»: ")
                     .append(artistas.size()).append("</p><ul>");
-            for (Artista artista : artistas) {
-                html.append("<li><a href=\"/artistas/").append(artista.getId()).append("\">")
-                        .append(Html.esc(artista.getNombre())).append("</a></li>");
+            for (ArtistaResumen artista : artistas) {
+                html.append("<li><a href=\"/artistas/").append(artista.id()).append("\">")
+                        .append(Html.esc(artista.nombre())).append("</a></li>");
             }
             html.append("</ul>");
         }
         return html.toString();
     }
 
+    // GET /artistas/{id}
     @GetMapping("/{id}")
     @ResponseBody
     public String ficha(@PathVariable Integer id) {
-        Artista artista = artistaService.buscarPorId(id);
+        ArtistaDetalle artista = artistaService.buscarPorId(id);
         StringBuilder html = new StringBuilder();
-        html.append("<h1>").append(Html.esc(artista.getNombre())).append("</h1>");
-        html.append("<ul>");
-        for (Album album : artista.getAlbumes()) {
-            html.append("<li><a href=\"/albumes/").append(album.getId()).append("\">")
-                    .append(Html.esc(album.getTitulo())).append("</a></li>");
+        html.append("<h1>").append(Html.esc(artista.nombre())).append("</h1>");
+        if (artista.albumes().isEmpty()) {
+            html.append("<p>Este artista no tiene álbumes en la tienda.</p>");
+        } else {
+            html.append("<p>").append(artista.albumes().size()).append(" álbumes:</p><ul>");
+            for (AlbumResumen album : artista.albumes()) {
+                html.append("<li><a href=\"/albumes/").append(album.id()).append("\">")
+                        .append(Html.esc(album.titulo())).append("</a></li>");
+            }
+            html.append("</ul>");
         }
-        html.append("</ul>");
         return html.toString();
     }
 }
