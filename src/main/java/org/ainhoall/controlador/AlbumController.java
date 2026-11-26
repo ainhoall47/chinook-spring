@@ -26,6 +26,13 @@ public class AlbumController {
         this.albumService = albumService;
     }
 
+    /**
+     * Muestra la ficha de los albumes de cada artista.
+     *
+     * @param id identificador del album, tomado de la ruta
+     * @return la página de la ficha
+     * @throws org.ainhoall.servicio.NoEncontradoException si el album no existe (la traduce a 404 ManejadorErrores)
+     */
     // GET /albumes/{id}
     @GetMapping("/{id}")
     @ResponseBody

@@ -50,7 +50,13 @@ public class ArtistaController {
         return Html.pagina("Buscar artistas", cuerpo.toString());
     }
 
-    // GET /artistas/{id}
+    /**
+     * Muestra la ficha de un artista con sus álbumes.
+     *
+     * @param id identificador del artista, tomado de la ruta
+     * @return la página de la ficha
+     * @throws org.ainhoall.servicio.NoEncontradoException si el artista no existe (la traduce a 404 ManejadorErrores)
+     */
     @GetMapping("/{id}")
     @ResponseBody
     public String ficha(@PathVariable Integer id) {
