@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/generos")
 public class GeneroController {
@@ -23,13 +25,13 @@ public class GeneroController {
     @GetMapping
     @ResponseBody
     public String listar() {
-        StringBuilder html = new StringBuilder();
-        html.append("<h1>Géneros</h1><ul>");
-        for (GeneroResumen genero : generoService.listar()) {
-            html.append("<li>").append(Html.esc(genero.nombre()))
-                    .append(" (").append(genero.numeroPistas()).append(" pistas)</li>");
+        List<GeneroResumen> generos = generoService.listar();
+        StringBuilder cuerpo = new StringBuilder();
+        for (GeneroResumen genero : generos) {
+            cuerpo.append("<li>").append(Html.esc(genero.nombre())).append(" (")
+                    .append(genero.numeroPistas()).append(" pistas)</li>");
         }
-        html.append("</ul>");
-        return html.toString();
+        cuerpo.append("</ul>");
+        return Html.pagina("Géneros", cuerpo.toString());
     }
 }

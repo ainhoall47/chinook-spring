@@ -15,14 +15,15 @@ public class ManejadorErrores {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public String noEncontrado(NoEncontradoException ex) {
-        return "<h1>No encontrado</h1><p>" + Html.esc(ex.getMessage()) + "</p>";
+        return Html.pagina("No encontrado", "<p>" + Html.esc(ex.getMessage()) + "</p>");
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public String datoIncorrecto(MethodArgumentTypeMismatchException ex) {
-        return "<h1>Petición incorrecta</h1><p>El valor «" + Html.esc(String.valueOf(ex.getValue()))
-                + "» no es válido para " + Html.esc(ex.getName()) + ".</p>";
+        return Html.pagina("Petición incorrecta",
+                "<p>El valor «" + Html.esc(String.valueOf(ex.getValue())) + "» no es válido para "
+                        + Html.esc(ex.getName()) + ".</p>");
     }
 }

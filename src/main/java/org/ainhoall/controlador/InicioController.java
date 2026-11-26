@@ -12,13 +12,13 @@ public class InicioController {
     @ResponseBody
     public String portada() {
         visitas++;
-        return "<h1>Chinook</h1>"
-                + "<p>Bienvenida a la tienda de música Chinook.</p>"
+        String cuerpo = "<p>Bienvenida a la tienda de música Chinook.</p>"
                 + "<ul>"
                 + "<li><a href=\"/generos\">Ver los géneros</a></li>"
                 + "<li><a href=\"/artistas/buscar?texto=metal\">Artistas que contienen «metal»</a></li>"
                 + "<li><a href=\"/artistas/1\">Ficha de AC/DC</a></li>"
                 + "</ul>"
                 + "<p><small>Visitas a la portada desde que arrancó el servidor: " + visitas + "</small></p>";
+        return Html.pagina("Inicio", cuerpo);
     }
 }

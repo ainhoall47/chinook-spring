@@ -33,22 +33,21 @@ public class ArtistaController {
     @GetMapping("/buscar")
     @ResponseBody
     public String buscar(@RequestParam(defaultValue = "") String texto) {
-        StringBuilder html = new StringBuilder();
-        html.append("<h1>Buscar artistas</h1>");
-        html.append("<form action=\"/artistas/buscar\" method=\"get\">")
+        StringBuilder cuerpo = new StringBuilder();
+        cuerpo.append("<form action=\"/artistas/buscar\" method=\"get\">")
                 .append("<input name=\"texto\" value=\"").append(Html.esc(texto)).append("\">")
                 .append(" <button>Buscar</button></form>");
         if (!texto.isBlank()) {
             List<ArtistaResumen> artistas = artistaService.buscarPorNombre(texto);
-            html.append("<p>Artistas que contienen «").append(Html.esc(texto)).append("»: ")
+            cuerpo.append("<p>Artistas que contienen «").append(Html.esc(texto)).append("»: ")
                     .append(artistas.size()).append("</p><ul>");
             for (ArtistaResumen artista : artistas) {
-                html.append("<li><a href=\"/artistas/").append(artista.id()).append("\">")
+                cuerpo.append("<li><a href=\"/artistas/").append(artista.id()).append("\">")
                         .append(Html.esc(artista.nombre())).append("</a></li>");
             }
-            html.append("</ul>");
+            cuerpo.append("</ul>");
         }
-        return html.toString();
+        return Html.pagina("Buscar artistas", cuerpo.toString());
     }
 
     // GET /artistas/{id}
@@ -56,18 +55,17 @@ public class ArtistaController {
     @ResponseBody
     public String ficha(@PathVariable Integer id) {
         ArtistaDetalle artista = artistaService.buscarPorId(id);
-        StringBuilder html = new StringBuilder();
-        html.append("<h1>").append(Html.esc(artista.nombre())).append("</h1>");
+        StringBuilder cuerpo = new StringBuilder();
         if (artista.albumes().isEmpty()) {
-            html.append("<p>Este artista no tiene álbumes en la tienda.</p>");
+            cuerpo.append("<p>Este artista no tiene álbumes en la tienda.</p>");
         } else {
-            html.append("<p>").append(artista.albumes().size()).append(" álbumes:</p><ul>");
+            cuerpo.append("<p>").append(artista.albumes().size()).append(" álbumes:</p><ul>");
             for (AlbumResumen album : artista.albumes()) {
-                html.append("<li><a href=\"/albumes/").append(album.id()).append("\">")
+                cuerpo.append("<li><a href=\"/albumes/").append(album.id()).append("\">")
                         .append(Html.esc(album.titulo())).append("</a></li>");
             }
-            html.append("</ul>");
+            cuerpo.append("</ul>");
         }
-        return html.toString();
+        return Html.pagina(artista.nombre(), cuerpo.toString());
     }
 }
